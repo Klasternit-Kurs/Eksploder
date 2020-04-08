@@ -6,8 +6,23 @@
         xmlns:local="clr-namespace:Eksploder"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-	<StackPanel>
-	    <TreeView Name="tv"/>
-		<Button Content="Rekurzija" FontSize="24" Click="Rek"/>
-	</StackPanel>
+	<DockPanel>
+		<StackPanel DockPanel.Dock="Right">
+			<UniformGrid Columns="2">
+				<Label Content="Ekstenzija: "/>
+				<Label Name="lblExt"/>
+				<Label Content="Puno ime: "/>
+				<Label Name="lblFname"/>
+				<Label Content="Kreiran: "/>
+				<Label Name= "lblKreiran"/>
+			</UniformGrid>
+
+		</StackPanel>
+		<ScrollViewer>
+			<StackPanel>
+				<TreeView Name="tv" SelectedItemChanged="SelektovanoNesto"/>
+				<Button Content="Rekurzija" FontSize="24" Click="Rek"/>
+			</StackPanel>
+		</ScrollViewer>
+	</DockPanel>
 </Window>

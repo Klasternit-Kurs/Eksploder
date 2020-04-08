@@ -28,7 +28,7 @@ namespace Eksploder
 			foreach (string drajv in System.Environment.GetLogicalDrives())
 			{
 				var particija = NapraviTVi(drajv);//drajv);
-				particija.Tag = "C:\\Test";
+				particija.Tag = drajv;
 				DriveInfo dr = new DriveInfo(drajv);
 				if (dr.IsReady)
 				{
@@ -48,13 +48,20 @@ namespace Eksploder
 				{
 					var podD = NapraviTVi(d.Name);
 					podD.Tag = d.FullName;
+					podD.Expanded += ZaExpand;
 					gde.Items.Add(podD);
-					if (d.GetDirectories().Length > 0 || d.GetFiles().Length > 0)
-						podD.Items.Add(NapraviTVi("*"));
+					try
+					{
+						if (d.GetDirectories().Length > 0 || d.GetFiles().Length > 0)
+							podD.Items.Add("*");
+					}
+					catch { }
 				}
 				foreach (FileInfo fajl in dir.GetFiles())
 				{
-					gde.Items.Add(fajl.Name);
+					var fTVi = NapraviTVi(fajl.Name);
+					fTVi.Tag = fajl.FullName;
+					gde.Items.Add(fTVi);
 				}
 			}
 			catch { }
@@ -85,6 +92,16 @@ namespace Eksploder
 			TreeViewItem TVi = new TreeViewItem();
 			TVi.Header = s;
 			return TVi;
+		}
+
+		private void ZaExpand(object KoSalje, RoutedEventArgs zklj)
+		{
+			var tvI = KoSalje as TreeViewItem;
+			if (tvI.Items.Contains("*"))
+			{
+				tvI.Items.Remove("*");
+				UcitajFajlove(tvI);
+			}
 		}
 
 		private void Rek(object sender, RoutedEventArgs e)
@@ -121,6 +138,29 @@ namespace Eksploder
 			{
 				return 0;
 			}
+		}
+
+		private void SelektovanoNesto(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			var treeV = sender as TreeView;
+			if (treeV.SelectedItem != null)
+			{
+				var tvI = treeV.SelectedItem as TreeViewItem;
+				if (Directory.Exists(tvI.Tag.ToString()))
+				{
+					DirectoryInfo d = new DirectoryInfo(tvI.Tag.ToString());
+					lblExt.Content = "-";
+					lblFname.Content = d.FullName;
+					lblKreiran.Content = d.CreationTime;
+				} else if (File.Exists(tvI.Tag.ToString()))
+				{
+					FileInfo f = new FileInfo(tvI.Tag.ToString());
+					lblExt.Content = f.Extension;
+					lblFname.Content = f.FullName;
+					lblKreiran.Content = f.CreationTime;
+				}
+			}
+			
 		}
 	}
 }
