@@ -27,26 +27,60 @@ namespace Eksploder
 
 			foreach (string drajv in System.Environment.GetLogicalDrives())
 			{
-				var particija = NapraviTVi(drajv);
+				var particija = NapraviTVi(drajv);//drajv);
+				particija.Tag = "C:\\Test";
 				DriveInfo dr = new DriveInfo(drajv);
-				DirectoryInfo root = dr.RootDirectory;
 				if (dr.IsReady)
 				{
-					foreach (DirectoryInfo dir in root.GetDirectories())
-					{
-						particija.Items.Add(dir.Name);
-					}
-					foreach (FileInfo fajl in root.GetFiles())
-					{
-						particija.Items.Add(fajl.Name);
-					}
+					UcitajFajlove(particija);
 				}
 				tv.Items.Add(particija);
 			}
 
 		}
 
-		public TreeViewItem NapraviTVi(string s)
+		public void UcitajFajlove(TreeViewItem gde)
+		{
+			DirectoryInfo dir = new DirectoryInfo(gde.Tag.ToString());
+			try
+			{
+				foreach (DirectoryInfo d in dir.GetDirectories())
+				{
+					var podD = NapraviTVi(d.Name);
+					podD.Tag = d.FullName;
+					gde.Items.Add(podD);
+					if (d.GetDirectories().Length > 0 || d.GetFiles().Length > 0)
+						podD.Items.Add(NapraviTVi("*"));
+				}
+				foreach (FileInfo fajl in dir.GetFiles())
+				{
+					gde.Items.Add(fajl.Name);
+				}
+			}
+			catch { }
+		}
+
+			/*public void UcitajFajlove(TreeViewItem gde)
+			{
+				DirectoryInfo dir = new DirectoryInfo(gde.Tag.ToString());
+				try
+				{
+					foreach (DirectoryInfo d in dir.GetDirectories())
+					{
+						var podD = NapraviTVi(d.Name);
+						podD.Tag = d.FullName;
+						gde.Items.Add(podD);
+						UcitajFajlove(podD);
+					}
+					foreach (FileInfo fajl in dir.GetFiles())
+					{
+						gde.Items.Add(fajl.Name);
+					}
+				}
+				catch { }
+			}*/
+
+			public TreeViewItem NapraviTVi(string s)
 		{
 			TreeViewItem TVi = new TreeViewItem();
 			TVi.Header = s;
@@ -55,7 +89,7 @@ namespace Eksploder
 
 		private void Rek(object sender, RoutedEventArgs e)
 		{
-			Odbrojac(5);
+			MessageBox.Show(Odbrojac(5).ToString());
 			//a();
 		}
 
@@ -77,15 +111,15 @@ namespace Eksploder
 
 
 
-		private void Odbrojac(int x)
+		private int Odbrojac(int x)
 		{
-			if (--x == 0)
+			if (--x > 0)
 			{
-				MessageBox.Show("Stigao do kraja!");
+				return Odbrojac(x);
+				
 			} else
 			{
-				Odbrojac(x);
-				MessageBox.Show($"Zavrsavam else sa: {x}");
+				return 0;
 			}
 		}
 	}
